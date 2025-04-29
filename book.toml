@@ -4,3 +4,16 @@ language = "en"
 multilingual = false
 src = "src"
 title = "Rust Book"
+
+[output.html]
+default-theme = "ayu"
+
+
+[output.html.fold]
+enable = true
+level = 1
+
+[output.html.playground]
+editable = true
+copyable = true
+runnable = true
