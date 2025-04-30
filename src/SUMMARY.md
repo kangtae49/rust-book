@@ -1,5 +1,7 @@
 # Summary
 - [Ownership](./ownership.md)
+- [Smart Pointer](./smart_pointers.md)
+- [Link](./link.md)
 
 - [Chapter 1](./chapter_1.md)
     - [Chapter 1-1]()
