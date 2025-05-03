@@ -6,3 +6,5 @@
 - <https://rust-exercises.com/100-exercises>
 
 - <https://doc.rust-lang.org/>
+
+- <https://blog.jetbrains.com/ko/rust/2024/11/27/how-to-learn-rust/>

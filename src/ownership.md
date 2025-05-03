@@ -5,11 +5,27 @@ let n2 = n1;  // `copy`
 println!("[{:p}] {}", &n1, n1);
 println!("[{:p}] {}", &n2, n2);
 ```
+| var | addr               | `i32`       |
+| --- | ------------------ | ----------- |
+| n1  | 0x0000004995affb50 | 20 00 00 00 |
+| n2  | 0x0000004995affb54 | 20 00 00 00 |
 
-| Stack | `i32` |
-| ----- | ----- |
-| `0x7ffc25bebdd0` | 32 |
-| `0x7ffc25bebdd4` | 32 |
+## `&str`
+```rust
+let s1 = "rust";  // static memory
+let s2 = s1;  // `borrowing`
+println!("[{:p}] [{:p}] {} {}", &s1, s1.as_ptr(), s1.len(), s1);
+println!("[{:p}] [{:p}] {} {}", &s2, s2.as_ptr(), s1.len(), s2);
+```
+| var | addr                 | `&str`                    |      |
+| --- | -------------------  | ------------------------- |----- |
+| s1  | 0x0000005dc016f798   | 80 a3 4e e1   f6 7f 00 00 | ptr  |
+|     |                      | 04 00 00 00   00 00 00 00 | len  |
+|     | `0x00007ff6e14ea380` | 72 75 73 74               | val  |
+| s2  | 0x0000005dc016f7a8   | 80 a3 4e e1   f6 7f 00 00 | ptr  |
+|     |                      | 04 00 00 00   00 00 00 00 | len  |
+|     | `0x00007ff6e14ea380` | 72 75 73 74               | rust |
+
 
 ## `String`
 ```rust
@@ -18,85 +34,87 @@ println!("[{:p}] ({:p}) {}", &s1, s1.as_ptr(), s1);
 let s2 = s1;  // `move`
 println!("[{:p}] ({:p}) {}", &s2, s2.as_ptr(), s2);
 ```
+| var | addr                 | `String`                  |      |
+| --- | -------------------- | ------------------------- | ---- |
+| s1  | 0x000000f0baaff648   | 04 00 00 00   00 00 00 00 |      |
+|     |                      | 50 58 a9 c6   af 02 00 00 | ptr  |
+|     |                      | 04 00 00 00   00 00 00 00 | len  |
+|     | `0x000002afc6a95850` | 72 75 73 74               | rust |
+| s2  | 0x000000f0baaff700   | 04 00 00 00   00 00 00 00 |      |
+|     |                      | 50 58 a9 c6   af 02 00 00 | ptr  |
+|     |                      | 04 00 00 00   00 00 00 00 | len  |
+|     | `0x000002afc6a95850` | 72 75 73 74               | rust |
 
-| Stack | Heap | `String` |
-| ----- | ---- | ----- |
-| 0x7ffc6affaba8 | `0x5f0bfcfd5b10` | rust |
-| 0x7ffc6affac60 | `0x5f0bfcfd5b10` | rust |
 
-## `&str`
-```rust
-let s1 = "rust";  // static memory
-let s2 = s1;  // `borrowing`
-println!("[{:p}] [{:p}] {}", &s1, s1.as_ptr(), s1);
-println!("[{:p}] [{:p}] {}", &s2, s2.as_ptr(), s2);
-```
-
-| Stack | Static | `&str` |
-| ----- | ------ | ----- |
-| 0xa3026ff8f8 | `0x7ff6a9c6a370` | rust |
-| 0xa3026ff908 | `0x7ff6a9c6a370` | rust |
 
 ## `Option<i32>`
 
 ```rust
-let opt1 = Some(32);  // stack memory
-let opt2 = opt1;  // `copy`
-
-if let Some(ref n1) = opt1 {
-    println!("[{:p}] [{:p}] {:?}", &opt1, &n1, n1);
-}
-
-if let Some(ref n2) = opt2 {
-    println!("[{:p}] [{:p}] {:?}", &opt2, &n2, n2);
-}
+    let n1 = Some(32);  // stack memory
+    let n2 = n1;  // `copy`
+    if let Some(x) = n1 {
+        println!("[{:p}] [{:p}] {}", &n1, &x, x);
+    }
+    if let Some(x) = n2 {
+        println!("[{:p}] [{:p}] {}", &n2, &x, x);
+    }
 ```
+ 
+| var | addr                 | `Option<i32>`             |        |
+| --- | -------------------- | ------------------------- | ------ |
+| n1  | 0x000000a587bbf328   | 01 00 00 00   20 00 00 00 | len 32 |
+| n2  | 0x000000a587bbf330   | 01 00 00 00   20 00 00 00 | len 32 |
 
-| Stack | Stack | `Option<i32>` |
-| ----- | ---- | ----------- |
-| 0x7ffcbc581d78 | `0x7ffcbc581d88` | 32 |
-| 0x7ffcbc581d80 | `0x7ffcbc581e30` | 32 |
+## Option<&str>
+```rust
+    let s1 = Some("rust");  // static memory
+    let s2 = s1;  // `borrowing`
+
+    if let Some(x) = s1 {
+        println!("[{:p}] [{:p}] {}", &s1, x.as_ptr(), x);
+    }
+
+    if let Some(x) = s2 {
+        println!("[{:p}] [{:p}] {}", &s2, x.as_ptr(), x);
+    }
+```
+| var | addr                 | `&str`          |      |
+| --- | -------------------- | ------------------------- | ---- |
+| s1  | 0x000000f8488ff7c8   | 80 a3 70 27   f7 7f 00 00 | ptr  |
+|     |                      | 04 00 00 00   00 00 00 00 | len  |
+|     | `0x00007ff72770a380` | 72 75 73 74               | rust |
+| s2  | 0x000000f8488ff888   | 80 a3 70 27   f7 7f 00 00 | ptr  |
+|     |                      | 04 00 00 00   00 00 00 00 | len  |
+|     | `0x00007ff72770a380` | 72 75 73 74               | rust |
 
 ## `Option<String>`
 
 ```rust
-let opt1 = Some(String::from("rust"));  // heap memory
+    let s1 = Some(String::from("rust"));  // heap memory
 
-if let Some(ref s1) = opt1 {
-    println!("[{:p}] ({:p}) {}", &opt1, s1.as_ptr(), s1);
-}
+    if let Some(ref x) = s1 {
+        println!("[{:p}] [{:p}] {}", &s1, x.as_ptr(), x);
+    }
 
-let opt2 = opt1;  // `move`
+    let s2 = s1;  // `move`
 
-if let Some(ref s2) = opt2 {
-    println!("[{:p}] ({:p}) {}", &opt2, s2.as_ptr(), s2);
-}
+    if let Some(ref x) = s2 {
+        println!("[{:p}] [{:p}] {}", &s2, x.as_ptr(), x);
+    }
 ```
 
-| Stack | Heap | `Option<String>` |
-| ----- | ---- | ----------- |
-| 0x7ffff0a60368 | `0x606459232b10` | rust |
-| 0x7ffff0a60440 | `0x606459232b10` | rust |
-
-## Option<&str>
-```rust
-let opt1 = Some("rust");  // static memory
-let opt2 = opt1;  // `borrow`
-
-if let Some(s1) = opt1 {
-    println!("[{:p}] [{:p}] {:?}", &opt1, s1.as_ptr(), s1);
-}
+| var | addr                 | `Option<String>`          |      |
+| --- | -------------------- | ------------------------- | ---- |
+| s1  | 0x00000069acf6f768   | 04 00 00 00   00 00 00 00 |      |
+|     |                      | 80 79 dd f4   8a 01 00 00 | ptr  |
+|     |                      | 04 00 00 00   00 00 00 00 | len  |
+|     | `0x0000018af4dd7980` | 72 75 73 74               | rust |
+| s2  | 0x00000069acf6f840   | 04 00 00 00   00 00 00 00 |      |
+|     |                      | 80 79 dd f4   8a 01 00 00 | ptr  |
+|     |                      | 04 00 00 00   00 00 00 00 | len  |
+|     | `0x0000018af4dd7980` | 72 75 73 74               | rust |
 
 
-if let Some(s2) = opt2 {
-    println!("[{:p}] [{:p}] {:?}", &opt2, s2.as_ptr(), s2);
-}
-```
-
-| Stack | Static | `Option<&str>` |
-| ----- | ---- | ----------- |
-| 0x7ffe24342648 | `0x5fdb0f182040` | rust |
-| 0x7ffe24342708 | `0x5fdb0f182040` | rust |
 
 ## Copy trait
 > `#derive(Copy)`

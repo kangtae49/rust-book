@@ -7,6 +7,7 @@ title = "Rust Book"
 
 [output.html]
 default-theme = "ayu"
+additional-css = ["src/theme/css/custom.css"]
 
 
 [output.html.fold]
@@ -17,3 +18,4 @@ level = 1
 editable = true
 copyable = true
 runnable = true
+
